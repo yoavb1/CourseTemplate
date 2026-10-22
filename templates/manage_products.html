@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Inventory | Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">🛠️ Admin Product Management</h2>
+    <a href="{% url 'analytics' %}" class="btn btn-warning">📊 Analytics Dashboard</a>
+</div>
+
+<div class="row g-4">
+    <!-- Add Product Form -->
+    <div class="col-md-5">
+        <div class="card p-4 shadow-sm">
+            <h4 class="fw-bold mb-3">➕ Add New Product</h4>
+            <!-- enctype="multipart/form-data" is required for file uploads -->
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Product Name</label>
+                    <input type="text" name="name" class="form-control" required placeholder="e.g. Ergonomic Chair">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Brand</label>
+                        <input type="text" name="brand" class="form-control" required placeholder="e.g. ComfortCo">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Price ($)</label>
+                        <input type="number" step="0.01" name="price" class="form-control" required placeholder="99.99">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Category</label>
+                    <input type="text" name="category" class="form-control" required placeholder="e.g. Furniture">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Upload Product Picture</label>
+                    <input type="file" name="image" class="form-control" accept="image/*">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Or Image URL (Fallback)</label>
+                    <input type="url" name="image_url" class="form-control" placeholder="https://example.com/photo.jpg">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Description</label>
+                    <textarea name="description" class="form-control" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success w-100 fw-bold">Save & Publish Product</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Table -->
+    <div class="col-md-7">
+        <div class="card p-4 shadow-sm">
+            <h4 class="fw-bold mb-3">📦 Existing Inventory ({{ products|length }})</h4>
+            <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Product</th>
+                            <th>Brand</th>
+                            <th>Price</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>
+                                <img src="{{ product.get_image_url }}" alt="{{ product.name }}" style="width: 45px; height: 45px; object-fit: cover;" class="rounded">
+                            </td>
+                            <td><strong>{{ product.name }}</strong></td>
+                            <td>{{ product.brand }}</td>
+                            <td class="text-success fw-bold">${{ product.price }}</td>
+                            <td><span class="badge bg-secondary">{{ product.category }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-muted text-center">No products in table yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

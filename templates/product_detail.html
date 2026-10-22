@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} | HCI Store{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="{% url 'index' %}" data-track-id="breadcrumb_home">Home</a></li>
+    <li class="breadcrumb-item active">{{ product.name }}</li>
+  </ol>
+</nav>
+
+<div class="card shadow-sm p-4 bg-white">
+    <div class="row g-4">
+        <div class="col-md-6">
+            <img src="{{ product.get_image_url }}" class="img-fluid rounded shadow-sm w-100" alt="{{ product.name }}" style="max-height: 400px; object-fit: cover;">
+        </div>
+        <div class="col-md-6 d-flex flex-column">
+            <span class="badge bg-dark mb-2 w-auto align-self-start">{{ product.brand }}</span>
+            <h1 class="fw-bold mb-2">{{ product.name }}</h1>
+            <h3 class="text-primary fw-bold mb-3">${{ product.price }}</h3>
+            <p class="text-muted mb-4">{{ product.description }}</p>
+
+            <div class="mt-auto">
+                <a href="{% url 'add_to_cart' product.id %}" 
+                   class="btn btn-primary btn-lg w-100 mb-2" 
+                   data-product-id="{{ product.id }}" 
+                   data-action="add_to_cart" 
+                   data-track-id="add_to_cart_btn">
+                    🛒 Add to Cart
+                </a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'toggle_favorite' product.id %}" 
+                       class="btn {% if is_favorite %}btn-danger{% else %}btn-outline-secondary{% endif %} w-100" 
+                       data-product-id="{{ product.id }}" 
+                       data-action="wishlist_toggle" 
+                       data-track-id="wishlist_btn">
+                        {% if is_favorite %}❤️ Remove from Wishlist{% else %}🤍 Save to Wishlist{% endif %}
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline-secondary w-100" data-track-id="login_to_wishlist_btn">
+                        🤍 Login to Save to Wishlist
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

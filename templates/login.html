@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | HCI Store{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card p-4 shadow-sm">
+            <h3 class="fw-bold mb-3">Login</h3>
+            {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" required placeholder="user@example.com">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100" data-track-id="submit_login_btn">Login</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

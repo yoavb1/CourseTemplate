@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Online Store | HCI Project{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8f9fa; }
+        .product-card { transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .footer { background: #1a252f; color: white; padding: 30px 0; margin-top: 60px; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'index' %}" data-track-id="nav_brand">🛍️ HCI Store</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'index' %}" data-track-id="nav_products">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}" data-track-id="nav_contact">Contact & Support</a></li>
+                </ul>
+
+                <ul class="navbar-nav gap-2 align-items-center">
+                    <!-- Shopping Cart Link with Item Counter Badge -->
+                    <li class="nav-item">
+                        <a href="{% url 'cart_detail' %}" class="btn btn-outline-light position-relative btn-sm me-2" data-track-id="nav_cart">
+                            🛒 Cart
+                            {% if request.session.cart %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ request.session.cart|length }}
+                                </span>
+                            {% endif %}
+                        </a>
+                    </li>
+
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light btn-sm" href="{% url 'profile' %}" data-track-id="nav_profile">👤 Profile & Orders</a>
+                        </li>
+                        {% if is_admin %}
+                            <li class="nav-item">
+                                <a class="btn btn-outline-warning btn-sm" href="{% url 'manage_products' %}" data-track-id="nav_manage_products">⚙️ Manage Inventory</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-warning btn-sm fw-bold" href="{% url 'analytics' %}" data-track-id="nav_analytics">📊 Admin Analytics</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="btn btn-danger btn-sm" href="{% url 'logout' %}" data-track-id="nav_logout">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}" data-track-id="nav_login">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary btn-sm" href="{% url 'register' %}" data-track-id="nav_register">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">HCI Course Project | Industrial Engineering & Management</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function sendLog(actionType, elementId, elementText, productId = null, details = '') {
+            fetch('/api/log-event/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    page_url: window.location.pathname,
+                    action_type: actionType,
+                    element_id: elementId,
+                    element_text: elementText,
+                    product_id: productId,
+                    details: details
+                })
+            }).catch(err => console.error('Tracking Error:', err));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            sendLog('page_view', 'page_load', document.title);
+
+            document.addEventListener('click', (event) => {
+                const target = event.target.closest('button, a, [data-track-id], [data-product-id]');
+                if (!target) return;
+
+                const elementId = target.getAttribute('data-track-id') || target.id || target.tagName.toLowerCase();
+                const elementText = (target.innerText || target.getAttribute('aria-label') || 'unlabeled').trim().substring(0, 100);
+                const productId = target.getAttribute('data-product-id') || null;
+                const actionType = target.getAttribute('data-action') || (target.tagName === 'BUTTON' ? 'button_click' : 'link_click');
+
+                sendLog(actionType, elementId, elementText, productId);
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

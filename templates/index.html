@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Store Catalog | HCI Project{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-5 p-4 bg-white rounded-3 shadow-sm">
+    <div class="col-md-8">
+        <h1 class="fw-bold text-dark">Explore Our Collection</h1>
+        <p class="text-muted fs-5 mb-0">Discover top-rated products designed for effortless everyday use.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <button class="btn btn-outline-primary" data-track-id="filter_all_btn">Filter: All Products</button>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for product in products %}
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 product-card shadow-sm" data-product-id="{{ product.id }}" data-track-id="product_card_{{ product.id }}">
+            <img src="{{ product.get_image_url }}" class="card-img-top" alt="{{ product.name }}" style="height: 220px; object-fit: cover;">
+            <div class="card-body d-flex flex-column">
+                <span class="badge bg-secondary mb-2 w-auto align-self-start">{{ product.brand }}</span>
+                <h5 class="card-title fs-6 fw-bold">{{ product.name }}</h5>
+                <p class="card-text text-muted small flex-grow-1">{{ product.description|truncatewords:10 }}</p>
+
+                <div class="d-flex justify-content-between align-items-center mt-3 gap-1">
+                    <span class="fs-5 fw-bold text-primary">${{ product.price }}</span>
+                    <div class="d-flex gap-1">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'toggle_favorite' product.id %}"
+                               class="btn btn-sm {% if product.id in user_favorites %}btn-danger{% else %}btn-outline-danger{% endif %}"
+                               data-product-id="{{ product.id }}"
+                               data-action="wishlist_toggle"
+                               data-track-id="favorite_btn_{{ product.id }}">
+                                {% if product.id in user_favorites %}❤️{% else %}🤍{% endif %}
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'product_detail' product.id %}"
+                           class="btn btn-sm btn-primary"
+                           data-product-id="{{ product.id }}"
+                           data-action="product_click"
+                           data-track-id="view_details_btn_{{ product.id }}">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

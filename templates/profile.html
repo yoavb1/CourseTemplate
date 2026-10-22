@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile | HCI Store{% endblock %}
+
+{% block content %}
+<h2 class="fw-bold mb-4">👤 Welcome, {{ user.username }}</h2>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-6">
+        <div class="card shadow-sm p-4 h-100">
+            <h4 class="fw-bold mb-3">❤️ Saved Favorites</h4>
+            <div class="list-group">
+                {% for fav in favorites %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ fav.product.name }}</strong>
+                            <div class="text-muted small">${{ fav.product.price }}</div>
+                        </div>
+                        <a href="{% url 'product_detail' fav.product.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">No favorite items saved yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm p-4 h-100">
+            <h4 class="fw-bold mb-3">📦 Purchase History</h4>
+            <div class="list-group">
+                {% for order in orders %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ order.product.name }}</strong>
+                            <span class="text-success fw-bold">${{ order.total_price }}</span>
+                        </div>
+                        <div class="text-muted small">Ordered on: {{ order.created_at|date:"M d, Y H:i" }}</div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">No previous orders found.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
